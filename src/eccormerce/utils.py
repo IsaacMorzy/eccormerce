@@ -30,3 +30,17 @@ def unique_slug_generator(instance, new_slug=None):
                 )
         return unique_slug_generator(instance, new_slug=new_slug)
     return slug
+
+def unique_order_id_generator(instance,):
+    """
+    This is for a Django project and it assumes your instance 
+    has a model with a slug field and a title character (char) field.
+    """
+    order_new_id = random_string_generator()
+
+    Klass = instance.__class__
+    qs_exists = Klass.objects.filter(order_id=order_new_id).exists()
+    if qs_exists:
+        return unique_slug_generator(instance)
+    return order_new_id
+ 

@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.db.models.signals import pre_save, post_save
 from django.urls import reverse
 
-from .utils import unique_slug_generator
+from eccormerce.utils import unique_slug_generator
 
 def get_filename_ext(filepath):
     base_name = os.path.basename(filepath)
@@ -34,9 +34,10 @@ class ProductQuerySet(models.query.QuerySet):
     def search(self, query):
         lookups = (Q(title__icontains=query) | 
                   Q(description__icontains=query) |
-                  Q(price__icontains=query))
-        #Q(tag__name__icotains=query)
-        # tshirt, t-shirt, t shirt,
+                  Q(price__icontains=query) |
+                  Q(tag__title__icontains=query)
+                  )
+        # tshirt, t-shirt, t shirt, red, green, blue,
         return self.filter(lookups).distinct()
 
 class ProductManager(models.Manager):
@@ -80,10 +81,27 @@ class Product(models.Model):
 
     def __unicode__(self):
         return self.title
-        
+
     @property
     def name(self):
         return self.title
+
+
+def product_pre_save_receiver(sender, instance, *args, **kwargs):
+    if not instance.slug:
+        instance.slug = unique_slug_generator(instance)
+
+pre_save.connect(product_pre_save_receiver, sender=Product)
+
+
+
+
+
+
+
+
+
+
 
 
 def product_pre_save_receiver(sender, instance, *args, **kwargs):
