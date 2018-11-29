@@ -1,4 +1,6 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
+
 
 
 from accounts.forms import LoginForm, GuestForm
@@ -40,6 +42,7 @@ def cart_update(request):
             json_data = {
                 "added": added,
                 "removed": not added,
+                "cartItemCount": cart_obj.products.count()
             }
             return JsonResponse(json_data)
         return redirect("cart:home")
